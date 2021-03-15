@@ -1,115 +1,62 @@
 package rian.example.quarkusfunction.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties
 public class CountryDetails {
 
-	private String Country;
+	@JsonProperty("Lat")
+	private String lat;
 
-	private String CountryCode;
+	@JsonProperty("Lon")
+	private String lon;
 
-	private String Province;
+	@JsonProperty("Cases")
+	private Integer cases;
 
-	private String City;
+	@JsonProperty("Status")
+	private String status;
 
-	private String CityCode;
-
-	private String Lat;
-
-	private String Lon;
-
-	private Integer Cases;
-
-	private String Status;
-
-	private String Date;
-
-	@Override
-	public String toString() {
-		return "CountryDetails [Country=" + Country + ", CountryCode=" + CountryCode + ", Province=" + Province
-				+ ", City=" + City + ", CityCode=" + CityCode + ", Lat=" + Lat + ", Lon=" + Lon + ", Cases=" + Cases
-				+ ", Status=" + Status + ", Date=" + Date + "]";
-	}
-
-	public String getCountry() {
-		return Country;
-	}
-
-	public void setCountry(String country) {
-		Country = country;
-	}
-
-	public String getCountryCode() {
-		return CountryCode;
-	}
-
-	public void setCountryCode(String countryCode) {
-		CountryCode = countryCode;
-	}
-
-	public String getProvince() {
-		return Province;
-	}
-
-	public void setProvince(String province) {
-		Province = province;
-	}
-
-	public String getCity() {
-		return City;
-	}
-
-	public void setCity(String city) {
-		City = city;
-	}
-
-	public String getCityCode() {
-		return CityCode;
-	}
-
-	public void setCityCode(String cityCode) {
-		CityCode = cityCode;
-	}
+	@JsonProperty("Date")
+	private String date;
 
 	public String getLat() {
-		return Lat;
+		return lat;
 	}
 
 	public void setLat(String lat) {
-		Lat = lat;
+		this.lat = lat;
 	}
 
 	public String getLon() {
-		return Lon;
+		return lon;
 	}
 
 	public void setLon(String lon) {
-		Lon = lon;
+		this.lon = lon;
 	}
 
 	public Integer getCases() {
-		return Cases;
+		return cases;
 	}
 
 	public void setCases(Integer cases) {
-		Cases = cases;
+		this.cases = cases;
 	}
 
 	public String getStatus() {
-		return Status;
+		return status;
 	}
 
 	public void setStatus(String status) {
-		Status = status;
+		this.status = status;
 	}
 
 	public String getDate() {
-		return Date;
+		return date;
 	}
 
 	public void setDate(String date) {
-		Date = date;
+		this.date = date;
 	}
 
 }

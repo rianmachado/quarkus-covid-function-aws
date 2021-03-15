@@ -11,10 +11,10 @@ public class CovidFunctionTest {
 
 	//@Test
 	public void testSimpleLambdaSuccess() throws Exception {
-		Request in = new Request();
-		in.setName("south-africa");
-		Response out = LambdaClient.invoke(Response.class, in);
-		Assertions.assertEquals("Sucesso ....", out.getMessage());
+//		Request in = new Request();
+//		in.setName("south-africa");
+//		Response out = LambdaClient.invoke(Response.class, in);
+//		Assertions.assertEquals("Sucesso ....", out.getMessage());
 	}
 
 }

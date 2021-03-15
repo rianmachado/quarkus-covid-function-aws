@@ -1,19 +1,29 @@
 package rian.example.quarkusfunction;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
-import javax.inject.Named;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import io.quarkus.funqy.Funq;
+import io.smallrye.mutiny.Uni;
 import rian.example.quarkusfunction.input.Request;
 import rian.example.quarkusfunction.mapper.Mapper;
+import rian.example.quarkusfunction.model.CountryDetails;
 import rian.example.quarkusfunction.output.Response;
 import rian.example.quarkusfunction.service.WebclientService;
 
-@Named("covidFunction")
-public class CovidFunction implements RequestHandler<Request, Response> {
+public class CovidFunction {
+
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = LoggerFactory.getLogger(CovidFunction.class);
 
 	@Inject
 	WebclientService webclientService;
@@ -21,38 +31,25 @@ public class CovidFunction implements RequestHandler<Request, Response> {
 	@Inject
 	Mapper mapper;
 
-	@Override
-	public Response handleRequest(Request input, Context context) {
-		Response response = new Response();
+	@Funq
+	public Uni<Response> covidFunction(Request request) throws InterruptedException, ExecutionException {
 
-		LambdaLogger logger = context.getLogger();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		webclientService.getCases(input.getName(), context).subscribe().with(item -> {
-			logger.log("Enviando.... Total: " + item);
-		}, failure -> failure.printStackTrace());
+		String retorno = webclientService.getCases(request.getCountry()).subscribe().asCompletionStage().get();
 
-		context.getLogger().log("**************** FIM getCases  **************************");
+		List<CountryDetails> list = mapper.mapperCountryDetailsToList(retorno);
+		LocalDate initial = LocalDate.of(request.getYear(), request.getMonth(), 1);
+		LocalDate start = initial.with(TemporalAdjusters.firstDayOfMonth());
+		LocalDate end = initial.with(TemporalAdjusters.lastDayOfMonth());
 
-		/*
-		 * result.subscribe().with(item -> { Integer total =
-		 * mapper.mapperToCountryDetailsList(item, context).stream() .mapToInt(caseCovid
-		 * -> caseCovid.getCases()).sum(); logger.log("Enviando.... Total: " + total);
-		 * }, failure -> failure.printStackTrace());
-		 */
+		List<CountryDetails> result = list.stream()
+				.filter(filter -> LocalDate.parse(filter.getDate(), formatter).isAfter(start)
+						&& LocalDate.parse(filter.getDate(), formatter).isBefore(end))
+				.collect(Collectors.toList());
 
-		/*
-		 * result.subscribe().with(item -> { logger.log("Enviando.... Total: " + item);
-		 * }, failure -> failure.printStackTrace());
-		 */
-
-		try {
-			Thread.currentThread().sleep(12000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		response.setMessage("Sucesso ....");
-		return response;
+		return Uni.createFrom()
+				.item(Response.builder().reportTitle("Evolution of cases in " + request.getCountry()).reportDatails(result).build());
 	}
 
 }
